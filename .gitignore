@@ -1,0 +1,12 @@
+.venv/
+.env
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+results/raw/*.tmp
+results/dashboard_state.json
+*.log
+SafeConnectKey_Submission/
+

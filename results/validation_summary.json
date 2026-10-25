@@ -1,0 +1,103 @@
+{
+  "run_id": "20261025T164515Z-a718bdf7",
+  "measurement_mode": "full",
+  "environment": {
+    "device_model": "Windows laptop (hostname withheld)",
+    "cpu": "Intel64 Family 6 Model 154 Stepping 4, GenuineIntel",
+    "ram_gb": 15.73,
+    "windows_build": "Windows-11-10.0.26300-SP0",
+    "python_version": "3.13.13",
+    "execution_profile": "local in-process FastAPI TestClient",
+    "power_mode": "not captured automatically",
+    "dependency_lock_hash": "772e8cdd4712ca429c84b1c97d004f6b697a8b8f62f87188f782859b432b3aea"
+  },
+  "validation": {
+    "passed": 18,
+    "total": 18,
+    "pass_rate_pct": 100.0
+  },
+  "handshake": {
+    "count": 600,
+    "failures": 0,
+    "median_ms": 50.4439,
+    "p95_ms": 59.493845,
+    "p99_ms": 63.041813,
+    "minimum_ms": 43.8485,
+    "maximum_ms": 113.8628
+  },
+  "resource": {
+    "peak_cpu_pct": 54.5,
+    "peak_rss_mb": 81.141
+  },
+  "concurrency_10": {
+    "throughput_rps": 17.054,
+    "p95_latency_ms": 672.187,
+    "error_rate_pct": 0.0
+  },
+  "near_data": {
+    "jobs": 1500,
+    "successful": 1500,
+    "bytes_avoided": 1733643600
+  },
+  "targets": {
+    "validation_pass_rate_pct": 100.0,
+    "handshake_p95_ms_max": 100.0,
+    "ten_client_error_rate_pct_max": 1.0,
+    "direct_process_peak_rss_mb_max": 256.0
+  },
+  "limitations": [
+    "Resource measurements include the Host and in-process FastAPI test harness, so they are not direct-process CSD-only measurements.",
+    "No physical computational-storage hardware or resource-limited container was used.",
+    "The narrated OBS video requires manual screen and microphone capture."
+  ],
+  "payload_crypto": [
+    {
+      "payload_bytes": 4096,
+      "operation": "decrypt",
+      "count": 600,
+      "median_ms": 0.028,
+      "p95_ms": 0.033715,
+      "median_mbps": 139.509
+    },
+    {
+      "payload_bytes": 4096,
+      "operation": "encrypt",
+      "count": 600,
+      "median_ms": 0.0398,
+      "p95_ms": 0.07193,
+      "median_mbps": 98.147
+    },
+    {
+      "payload_bytes": 524288,
+      "operation": "decrypt",
+      "count": 300,
+      "median_ms": 0.5281,
+      "p95_ms": 0.75438,
+      "median_mbps": 946.79
+    },
+    {
+      "payload_bytes": 524288,
+      "operation": "encrypt",
+      "count": 300,
+      "median_ms": 0.5722,
+      "p95_ms": 0.88916,
+      "median_mbps": 873.821
+    },
+    {
+      "payload_bytes": 5242880,
+      "operation": "decrypt",
+      "count": 90,
+      "median_ms": 11.4646,
+      "p95_ms": 13.205625,
+      "median_mbps": 436.125
+    },
+    {
+      "payload_bytes": 5242880,
+      "operation": "encrypt",
+      "count": 90,
+      "median_ms": 11.4995,
+      "p95_ms": 13.36003,
+      "median_mbps": 434.802
+    }
+  ]
+}

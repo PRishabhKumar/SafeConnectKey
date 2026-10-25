@@ -1,0 +1,12 @@
+profile: recommended
+targets:
+  required_validation_tests: 18
+  validation_pass_rate_pct: 100
+  authentication_attack_rejections_pct: 100
+  handshake_p95_ms_max: 100
+  ten_client_error_rate_pct_max: 1
+  direct_process_peak_rss_mb_max: 256
+notes:
+  - These are acceptance targets, not measurements.
+  - Measured values are generated under results/ and are never copied into this file.
+

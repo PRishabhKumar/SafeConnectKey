@@ -1,0 +1,8 @@
+device_model: Windows laptop (hostname withheld)
+cpu: Intel64 Family 6 Model 154 Stepping 4, GenuineIntel
+ram_gb: 15.73
+windows_build: Windows-11-10.0.26300-SP0
+python_version: 3.13.13
+execution_profile: local in-process FastAPI TestClient
+power_mode: not captured automatically
+dependency_lock_hash: 772e8cdd4712ca429c84b1c97d004f6b697a8b8f62f87188f782859b432b3aea

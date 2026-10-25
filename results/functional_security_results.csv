@@ -1,0 +1,19 @@
+test_id,expected_result,observed_result,status,evidence_file
+V01,Session established and key fingerprints match.,passed,PASS,evidence/validation-junit.xml
+V02,Wrong AuthK is rejected; no session is created.,passed,PASS,evidence/validation-junit.xml
+V03,Wrong EnK fails authenticated decryption.,passed,PASS,evidence/validation-junit.xml
+V04,Modified AuthTd is rejected.,passed,PASS,evidence/validation-junit.xml
+V05,Modified SessTd is rejected by AES-GCM.,passed,PASS,evidence/validation-junit.xml
+V06,Expired challenge is rejected.,passed,PASS,evidence/validation-junit.xml
+V07,Consumed handshake is rejected as replay.,passed,PASS,evidence/validation-junit.xml
+V08,Substituted identity fails authentication.,passed,PASS,evidence/validation-junit.xml
+V09,Encrypted SHA-256 job returns the correct digest.,passed,PASS,evidence/validation-junit.xml
+V10,Modified job ciphertext is rejected without execution.,passed,PASS,evidence/validation-junit.xml
+V11,Repeated message sequence is rejected without duplicate execution.,passed,PASS,evidence/validation-junit.xml
+V12,Skipped sequence is rejected as out of order.,passed,PASS,evidence/validation-junit.xml
+V13,Expired session requires re-authentication.,passed,PASS,evidence/validation-junit.xml
+V14,Unknown operation returns a validated error.,passed,PASS,evidence/validation-junit.xml
+V15,Traversal outside csd_data is rejected.,passed,PASS,evidence/validation-junit.xml
+V16,Oversized request is rejected before processing.,passed,PASS,evidence/validation-junit.xml
+V17,Ten concurrent sessions remain isolated and complete.,passed,PASS,evidence/validation-junit.xml
+V18,Old session fails after restart and new handshake succeeds.,passed,PASS,evidence/validation-junit.xml
