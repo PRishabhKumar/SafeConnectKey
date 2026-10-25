@@ -10,3 +10,12 @@ results/dashboard_state.json
 *.log
 SafeConnectKey_Submission/
 
+.run/
+tmp/
+.streamlit/secrets.toml
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
