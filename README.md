@@ -17,6 +17,7 @@ MD5 and AES-ECB are not implemented. Keys and protected plaintext are never logg
 - Streamlit dashboard with session status, handshake trace, job result, security events, and measured charts
 - V01–V18 validation suite, attack runner, benchmarks, analysis, charts, evidence capture, and submission exporter
 - PowerShell setup/start/reset/validation flow for Windows
+- Two-laptop private-Wi-Fi launchers, readiness checks, and external-device measurements
 
 ## Clean Windows setup
 
@@ -42,6 +43,20 @@ Start the two long-running processes:
 ```
 
 Open `http://127.0.0.1:8501`, click **Run handshake**, then **Run SHA-256 job**. The dashboard's tamper and replay buttons create safe negative demonstrations without displaying keys or protected plaintext.
+
+## Streamlit Community Cloud
+
+The root `streamlit_app.py` entrypoint supports a self-contained cloud demo. In cloud mode, the dashboard hosts the FastAPI CSD emulator in-process, so no second public service or localhost port is required. Local launches keep using the separate CSD process by default.
+
+Deploy `streamlit_app.py` from the `main` branch. In **Advanced settings → Secrets**, add three root-level TOML values:
+
+```toml
+SCK_CSD_MODE = "embedded"
+SCK_AUTH_KEY = "a-new-base64url-encoded-32-byte-demo-key"
+SCK_ENC_KEY = "a-different-base64url-encoded-32-byte-demo-key"
+```
+
+Generate the complete block of fresh cloud-only values with `python -m scripts.generate_streamlit_secrets`, then paste its output directly into the Cloud secrets field. The command prints the values but does not write them to disk or alter the local `.env`. Never commit `.env` or `.streamlit/secrets.toml`. Root-level Streamlit secrets are exposed to the app as environment variables, which the existing key loader consumes.
 
 Run the command-line Host in another PowerShell window:
 
@@ -141,3 +156,31 @@ The final narrated video cannot be generated safely without the operator's micro
 ## Repository layout
 
 `shared/` holds schemas, canonical encoding, keys, cryptography, protocol metadata, and safe audit events. `csd_app/` owns handshakes, sessions, the data store, and jobs. `host_app/` independently verifies/derives the session and sends encrypted jobs. `dashboard/` is the live UI. `validation/`, `tests/`, and `scripts/` produce the reproducible evidence.
+
+## Two physical laptops on the same Wi-Fi
+
+Use [the complete two-laptop runbook](docs/TWO_LAPTOP_WIFI_GUIDE.md). It covers both Windows devices from clean setup through LAN/firewall checks, one-time shared-key provisioning, remote CSD startup, Host readiness and handshake verification, three measured runs, dashboard use, evidence collection, cleanup, and troubleshooting.
+
+The important commands are:
+
+```powershell
+# CSD laptop (use its Wi-Fi IPv4 address)
+.\scripts\start_csd_lan.ps1 -BindAddress <CSD_IP> -Port 8001
+
+# Host laptop
+.\.venv\Scripts\python.exe -m host_app.client check --base-url http://<CSD_IP>:8001
+.\.venv\Scripts\python.exe -m validation.run_lan_benchmarks --base-url http://<CSD_IP>:8001 --output results\laptop-run-001 --label two-laptop
+```
+
+The two laptops must have the exact same `.env` but must never commit it. A successful OS ping is not sufficient: the Host `check` command verifies the CSD TCP/HTTP service, protocol version, and identity.
+
+# Two-VM experiment
+
+See [the step-by-step VM guide](docs/TWO_VM_GUIDE.md) for VirtualBox setup, Host/CSD
+role packages, key provisioning, private networking and per-command instructions.
+Run `python -m scripts.package_vms` to build source-only bundles (no datasets or keys).
+The Host runs `validation.run_vm_benchmarks` against the external CSD; the secure
+`benchmark_crypto` job measures CSD-resident Text/Image/Audio without transferring sources.
+Exports reproduce FIG.4–7 chart styles using secure algorithms and explicit units.
+Set `SCK_VM_RESULTS` to a run directory to display its evidence in the dashboard.
+Local loopback smoke results are not VM results. See the guide for methodology limitations.

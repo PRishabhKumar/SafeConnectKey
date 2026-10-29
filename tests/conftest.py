@@ -7,6 +7,7 @@ from fastapi.testclient import TestClient
 
 from csd_app.main import create_app
 from host_app.client import HostClient
+from shared.audit import AuditLog
 from shared.config import DEFAULT_SETTINGS
 from shared.keys import KeyMaterial
 
@@ -18,7 +19,7 @@ def keys() -> KeyMaterial:
 
 @pytest.fixture
 def app(keys: KeyMaterial):
-    return create_app(DEFAULT_SETTINGS, keys)
+    return create_app(DEFAULT_SETTINGS, keys, AuditLog())
 
 
 @pytest.fixture

@@ -13,7 +13,7 @@ from shared.canonical import canonical_json
 from shared.schemas import JobCommand, JobResult
 
 
-ALLOWED_OPERATIONS = {"sha256", "word_count", "image_metadata", "audio_metadata", "compression"}
+ALLOWED_OPERATIONS = {"sha256", "word_count", "image_metadata", "audio_metadata", "compression", "benchmark_crypto"}
 
 
 class JobExecutor:
@@ -50,6 +50,9 @@ class JobExecutor:
             )
 
     def _dispatch(self, operation: str, path: Path) -> dict[str, object]:
+        if operation == "benchmark_crypto":
+            from csd_app.measurements import measure_file
+            return measure_file(path)
         data = path.read_bytes()
         digest = hashlib.sha256(data).hexdigest()
         if operation == "sha256":

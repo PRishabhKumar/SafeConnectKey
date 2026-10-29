@@ -11,6 +11,7 @@ results/dashboard_state.json
 SafeConnectKey_Submission/
 
 .run/
+dist/
 tmp/
 .streamlit/secrets.toml
 .env.*
@@ -19,3 +20,9 @@ tmp/
 *.key
 *.p12
 *.pfx
+results/raw/security_events.jsonl
+results/vm-loopback-smoke*/
+results/laptop-run-*/
+Planning Docs/explanations.md
+after_vm_creation.md
+ubuntu_cli_cheat_sheet_2025.pdf

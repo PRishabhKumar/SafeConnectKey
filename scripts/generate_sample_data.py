@@ -9,7 +9,7 @@ from pathlib import Path
 
 from PIL import Image
 
-from shared.config import PROJECT_ROOT
+from shared.config import PROJECT_ROOT, DEFAULT_SETTINGS
 
 
 SIZES = {"sample.txt": 4 * 1024, "sample.png": 512 * 1024, "sample.wav": 5 * 1024 * 1024}
@@ -47,7 +47,7 @@ def make_wav(path: Path) -> None:
 
 
 def main() -> None:
-    data_root = PROJECT_ROOT / "csd_data"
+    data_root = DEFAULT_SETTINGS.data_root
     data_root.mkdir(parents=True, exist_ok=True)
     make_text(data_root / "sample.txt")
     make_png(data_root / "sample.png")

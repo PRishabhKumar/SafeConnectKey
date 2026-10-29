@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import os
 
 import psutil
@@ -13,11 +14,15 @@ from shared.keys import KeyMaterial, load_key_material
 from shared.schemas import HandshakeCompleteRequest, HandshakeInitRequest, SecureEnvelope
 
 
-def create_app(settings: Settings = DEFAULT_SETTINGS, keys: KeyMaterial | None = None) -> FastAPI:
+def create_app(
+    settings: Settings = DEFAULT_SETTINGS,
+    keys: KeyMaterial | None = None,
+    audit: AuditLog | None = None,
+) -> FastAPI:
     service = CSDService(
         settings,
         keys or load_key_material(),
-        AuditLog(settings.results_root / "raw" / "security_events.jsonl"),
+        audit or AuditLog(settings.results_root / "raw" / "security_events.jsonl"),
     )
     app = FastAPI(title="SafeConnectKey CSD Emulator", version="1.0.0")
     app.state.sck_service = service
@@ -36,7 +41,12 @@ def create_app(settings: Settings = DEFAULT_SETTINGS, keys: KeyMaterial | None =
 
     @app.get("/health")
     def health() -> dict[str, str]:
-        return {"status": "ready", "protocol": settings.protocol, "profile": "recommended"}
+        return {
+            "status": "ready",
+            "protocol": settings.protocol,
+            "profile": "recommended",
+            "csd_id": settings.csd_id,
+        }
 
     @app.post("/api/v1/handshake/init", status_code=201)
     def handshake_init(request: HandshakeInitRequest):
@@ -77,3 +87,21 @@ def create_app(settings: Settings = DEFAULT_SETTINGS, keys: KeyMaterial | None =
 
 
 app = create_app()
+
+
+def main() -> None:
+    """Run one foreground CSD worker for a local or private-LAN experiment."""
+    import uvicorn
+
+    parser = argparse.ArgumentParser(description="SafeConnectKey CSD service")
+    parser.add_argument("--host", default=os.getenv("SCK_CSD_BIND", "127.0.0.1"))
+    parser.add_argument("--port", type=int, default=int(os.getenv("SCK_CSD_PORT", "8001")))
+    parser.add_argument("--no-access-log", action="store_true")
+    args = parser.parse_args()
+    if not 1 <= args.port <= 65535:
+        parser.error("--port must be between 1 and 65535")
+    uvicorn.run(app, host=args.host, port=args.port, workers=1, access_log=not args.no_access_log)
+
+
+if __name__ == "__main__":
+    main()

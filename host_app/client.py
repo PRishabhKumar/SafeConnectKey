@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import sys
 from typing import Any
 
 import httpx
@@ -10,6 +12,14 @@ from host_app.handshake import HostHandshake, HostProtocolError, HostSession
 from host_app.secure_jobs import SecureJobClient
 from shared.config import DEFAULT_SETTINGS, Settings
 from shared.keys import KeyMaterial, load_key_material
+
+
+DEFAULT_CSD_BASE_URL = "http://127.0.0.1:8001"
+
+
+def configured_base_url() -> str:
+    """Return the external CSD URL shared by the CLI and dashboard."""
+    return os.getenv("SCK_CSD_BASE_URL", DEFAULT_CSD_BASE_URL).strip() or DEFAULT_CSD_BASE_URL
 
 
 class HostClient:
@@ -41,8 +51,23 @@ class HostClient:
             self.session = None
 
 
-def run_demo(base_url: str) -> None:
-    with httpx.Client(base_url=base_url, timeout=10.0) as transport:
+def check_csd(base_url: str, timeout: float = 10.0) -> dict[str, str]:
+    """Verify TCP/HTTP reachability and return the remote CSD identity."""
+    with httpx.Client(base_url=base_url, timeout=timeout) as transport:
+        response = transport.get("/health")
+        response.raise_for_status()
+        health = response.json()
+    if (
+        health.get("status") != "ready"
+        or health.get("protocol") != DEFAULT_SETTINGS.protocol
+        or health.get("csd_id") != DEFAULT_SETTINGS.csd_id
+    ):
+        raise RuntimeError(f"Unexpected CSD health response: {health}")
+    return health
+
+
+def run_demo(base_url: str, timeout: float = 10.0) -> None:
+    with httpx.Client(base_url=base_url, timeout=timeout) as transport:
         client = HostClient(transport)
         session = client.connect()
         result = client.jobs().submit("sha256", "sample.txt")
@@ -52,10 +77,21 @@ def run_demo(base_url: str) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="SafeConnectKey Host application")
-    parser.add_argument("command", choices=["demo"], nargs="?", default="demo")
-    parser.add_argument("--base-url", default="http://127.0.0.1:8001")
+    parser.add_argument("command", choices=["check", "demo"], nargs="?", default="demo")
+    parser.add_argument("--base-url", default=configured_base_url(), help="CSD URL (default: SCK_CSD_BASE_URL or loopback)")
+    parser.add_argument("--timeout", type=float, default=10.0, help="Network timeout in seconds")
     args = parser.parse_args()
-    run_demo(args.base_url)
+    if args.timeout <= 0:
+        parser.error("--timeout must be positive")
+    try:
+        if args.command == "check":
+            health = check_csd(args.base_url, args.timeout)
+            print(json.dumps({"reachable": True, "base_url": args.base_url, **health}, indent=2))
+        else:
+            run_demo(args.base_url, args.timeout)
+    except (httpx.HTTPError, HostProtocolError, RuntimeError, ValueError) as exc:
+        print(f"SafeConnectKey Host error: {exc}", file=sys.stderr)
+        raise SystemExit(1) from exc
 
 
 if __name__ == "__main__":
